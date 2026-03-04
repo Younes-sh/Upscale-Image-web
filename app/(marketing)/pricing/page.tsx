@@ -7,7 +7,7 @@ import {
   SparklesIcon, 
   BoltIcon,
   ShieldCheckIcon,
-  ArrowPathIcon,
+  // ArrowPathIcon,
   DevicePhoneMobileIcon,
   CloudArrowUpIcon
 } from '@heroicons/react/24/outline';
@@ -329,7 +329,7 @@ export default function PricingPage() {
           <ShieldCheckIcon className="w-16 h-16 mx-auto mb-6 opacity-90" />
           <h2 className="text-3xl font-bold mb-4">30-Day Money-Back Guarantee</h2>
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            If you're not completely satisfied with UltraPixel, contact us within 30 days for a full refund. No questions asked.
+            If you&apos;re not completely satisfied with UltraPixel, contact us within 30 days for a full refund. No questions asked.
           </p>
           <Link
             href="/register"

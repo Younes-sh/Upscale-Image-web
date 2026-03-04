@@ -80,8 +80,11 @@ export default function UpscalePage() {
       setProcessedImage(response.data.image.upscaledUrl);
       setFreeUsesLeft(response.data.freeUsesRemaining);
     }
-  } catch (error: any) {
-    setError(error.response?.data?.message || 'Error processing image');
+  } catch (error: unknown) {
+    const errorMessage = error && typeof error === 'object' && 'response' in error
+      ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
+      : 'Error processing image';
+    setError(errorMessage || 'Error processing image');
     console.error('Upscale error:', error);
   } finally {
     setLoading(false);

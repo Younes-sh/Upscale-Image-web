@@ -117,9 +117,10 @@ export default function VerifyEmailPage() {
           router.push('/upscale');
         }, 2000);
       }
-    } catch (err: any) {
-      console.error('Verification error:', err.response?.data || err);
-      setError(err.response?.data?.message || 'Invalid verification code');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      console.error('Verification error:', error.response?.data || err);
+      setError(error.response?.data?.message || 'Invalid verification code');
     } finally {
       setLoading(false);
     }
@@ -140,8 +141,9 @@ export default function VerifyEmailPage() {
       await authApi.resendVerification(email);
       setResendSuccess(true);
       setCountdown(60);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to resend code');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Failed to resend code');
     } finally {
       setResendLoading(false);
     }
@@ -195,7 +197,7 @@ export default function VerifyEmailPage() {
           Verify your email
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
-          We've sent a 6-digit code to <strong className="text-blue-600">{email}</strong>
+          We&apos;ve sent a 6-digit code to <strong className="text-blue-600">{email}</strong>
         </p>
       </div>
 
@@ -231,6 +233,8 @@ export default function VerifyEmailPage() {
                     value={digit}
                     onChange={(e) => handleCodeChange(index, e.target.value)}
                     onKeyDown={(e) => handleKeyDown(index, e)}
+                    placeholder="0"
+                    title={`Digit ${index + 1}`}
                     className="w-12 h-12 text-center text-xl font-bold border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all"
                     autoFocus={index === 0}
                   />
@@ -256,7 +260,7 @@ export default function VerifyEmailPage() {
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-700">
-              Didn't receive the code?{' '}
+              Didn&apos;t receive the code?{' '}
               <button
                 onClick={handleResend}
                 disabled={resendLoading || countdown > 0}

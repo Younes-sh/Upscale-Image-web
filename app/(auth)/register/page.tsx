@@ -107,8 +107,10 @@ export default function RegisterPage() {
         router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`);
       }, 2000);
     }
-  } catch (err: any) {
-    setError(err.response?.data?.message || 'Registration failed. Please try again.');
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'Registration failed. Please try again.';
+    const apiError = err as { response?: { data?: { message?: string } } };
+    setError(apiError.response?.data?.message || errorMessage);
   } finally {
     setLoading(false);
   }

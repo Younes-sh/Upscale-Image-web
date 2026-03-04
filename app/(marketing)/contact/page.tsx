@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { 
   EnvelopeIcon, 
@@ -56,7 +55,7 @@ export default function ContactPage() {
             Get in Touch
           </h1>
           <p className="text-xl text-gray-600">
-            Have questions about UltraPixel? We're here to help and answer any questions you might have.
+            Have questions about UltraPixel? We&apos;re here to help and answer any questions you might have.
           </p>
         </div>
       </div>
@@ -158,7 +157,7 @@ export default function ContactPage() {
                 <div className="mb-6 bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
                   <CheckCircleIcon className="w-5 h-5 text-green-600 flex-shrink-0" />
                   <p className="text-green-700">
-                    Thank you for reaching out! We'll get back to you within 24 hours.
+                    Thank you for reaching out! We&apos;ll get back to you within 24 hours.
                   </p>
                 </div>
               )}

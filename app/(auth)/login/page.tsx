@@ -51,8 +51,9 @@ export default function LoginPage() {
         // هدایت به صفحه آپلود
         router.push('/upscale');
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Invalid email or password');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Invalid email or password');
     } finally {
       setLoading(false);
     }
@@ -81,7 +82,7 @@ export default function LoginPage() {
           Welcome Back
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <Link href="/register" className="font-medium text-blue-600 hover:text-blue-500">
             Sign up for free
           </Link>

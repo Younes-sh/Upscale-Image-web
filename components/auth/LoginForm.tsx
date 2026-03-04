@@ -29,7 +29,7 @@ export default function LoginForm() {
       } else {
         router.push('/upscale');
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred. Please try again.');
     } finally {
       setLoading(false);
@@ -44,7 +44,7 @@ export default function LoginForm() {
     <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8">
       <h2 className="text-3xl font-bold text-gray-900 mb-2 text-center">Welcome Back</h2>
       <p className="text-gray-600 text-center mb-8">
-        Don't have an account?{' '}
+        Don&apos;t have an account?{' '}
         <a href="/register" className="text-blue-600 hover:underline">
           Sign up for free
         </a>

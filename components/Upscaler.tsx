@@ -15,14 +15,14 @@ interface UpscalerProps {
       type: 'free' | 'monthly' | 'yearly';
     };
   } | null;
-  onUpscaleComplete?: (data: any) => void;
+  onUpscaleComplete?: (data: unknown) => void;
 }
 
 export default function Upscaler({ user, onUpscaleComplete }: UpscalerProps) {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<unknown>(null);
   const [error, setError] = useState<string | null>(null);
   const [upscaleFactor, setUpscaleFactor] = useState<number>(4);
   const [enhancementType, setEnhancementType] = useState<string>('standard');
@@ -77,11 +77,13 @@ export default function Upscaler({ user, onUpscaleComplete }: UpscalerProps) {
       if (onUpscaleComplete) {
         onUpscaleComplete(response.data);
       }
-    } catch (err: any) {
-      if (err.response?.status === 403 && err.response?.data?.code === 'FREE_USES_EXHAUSTED') {
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.status === 403 && err.response?.data?.code === 'FREE_USES_EXHAUSTED') {
         setError('free_uses_exhausted');
-      } else {
+      } else if (axios.isAxiosError(err)) {
         setError(err.response?.data?.message || 'Error processing image');
+      } else {
+        setError('Error processing image');
       }
     } finally {
       setLoading(false);

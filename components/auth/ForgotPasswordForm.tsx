@@ -1,16 +1,16 @@
 'use client';
 
 import { useState } from 'react';
+import { AxiosError } from 'axios';
 import { EnvelopeIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { authApi } from '../../lib/api';
 
 interface ForgotPasswordFormProps {
   onSuccess?: () => void;
-  onCancel?: () => void;
 }
 
-export default function ForgotPasswordForm({ onSuccess, onCancel }: ForgotPasswordFormProps) {
+export default function ForgotPasswordForm({ onSuccess }: ForgotPasswordFormProps) {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -40,8 +40,9 @@ export default function ForgotPasswordForm({ onSuccess, onCancel }: ForgotPasswo
       setSuccess(true);
       startCooldown();
       if (onSuccess) onSuccess();
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'An error occurred. Please try again.');
+    } catch (err: unknown) {
+      const axiosError = err as AxiosError<{ message: string }>;
+      setError(axiosError.response?.data?.message || 'An error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -53,7 +54,7 @@ export default function ForgotPasswordForm({ onSuccess, onCancel }: ForgotPasswo
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Forgot Password?</h2>
         <p className="text-gray-600">
-          No worries! Enter your email and we'll send you reset instructions.
+          No worries! Enter your email and we&apos;ll send you reset instructions.
         </p>
       </div>
 
@@ -65,10 +66,10 @@ export default function ForgotPasswordForm({ onSuccess, onCancel }: ForgotPasswo
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Check Your Email</h3>
             <p className="text-gray-600 mb-4">
-              We've sent reset instructions to <strong>{email}</strong>
+              We&apos;ve sent reset instructions to <strong>{email}</strong>
             </p>
             <p className="text-sm text-gray-500">
-              Didn't receive the email? Check your spam folder or{' '}
+              Didn&apos;t receive the email? Check your spam folder or{' '}
               <button
                 onClick={handleSubmit}
                 disabled={cooldown > 0}

@@ -13,11 +13,22 @@ import {
   UserCircleIcon,
   ArrowRightOnRectangleIcon
 } from '@heroicons/react/24/outline';
+import { Session } from 'next-auth';
+
+interface User {
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+}
+
+interface ExtendedSession extends Session {
+  backendToken?: string;
+}
 
 export default function Header() {
   const pathname = usePathname();
   const { data: session, status } = useSession();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const loading = status === 'loading';
 
   useEffect(() => {
@@ -25,8 +36,8 @@ export default function Header() {
     if (session?.user) {
       setUser(session.user);
       // ذخیره توکن بک‌اند در localStorage
-      if (session.backendToken) {
-        localStorage.setItem('token', session.backendToken);
+      if ((session as ExtendedSession)?.backendToken) {
+        localStorage.setItem('token', (session as ExtendedSession).backendToken!);
         localStorage.setItem('user', JSON.stringify(session.user));
       }
     } else {

@@ -16,29 +16,31 @@ export default function AccountPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'security' | 'billing'>('overview');
 
+
+
   useEffect(() => {
-    loadUser();
-  }, []);
+    const loadUser = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          router.push('/login');
+          return;
+        }
 
-  const loadUser = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
+        const response = await authApi.getMe();
+        if (response.success) {
+          setUser(response.data.user);
+        }
+      } catch (error) {
+        console.error('Failed to load user:', error);
         router.push('/login');
-        return;
+      } finally {
+        setLoading(false);
       }
+    };
 
-      const response = await authApi.getMe();
-      if (response.success) {
-        setUser(response.data.user);
-      }
-    } catch (error) {
-      console.error('Failed to load user:', error);
-      router.push('/login');
-    } finally {
-      setLoading(false);
-    }
-  };
+    loadUser();
+  }, [router]);
 
   if (loading) {
     return (

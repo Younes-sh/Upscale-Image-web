@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { LockIcon, EyeIcon, EyeSlashIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
+import { LockClosedIcon, EyeIcon, EyeSlashIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import { authApi } from '../../lib/api';
 
 interface ChangePasswordFormProps {
@@ -73,8 +73,8 @@ export default function ChangePasswordForm({ onSuccess, onCancel }: ChangePasswo
       setTimeout(() => {
         if (onSuccess) onSuccess();
       }, 2000);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to change password');
+    } catch (err: unknown) {
+      setError((err as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to change password');
     } finally {
       setLoading(false);
     }
@@ -104,7 +104,7 @@ export default function ChangePasswordForm({ onSuccess, onCancel }: ChangePasswo
               Current Password
             </label>
             <div className="relative">
-              <LockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <LockClosedIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type={showPasswords.current ? 'text' : 'password'}
                 name="currentPassword"
@@ -129,7 +129,7 @@ export default function ChangePasswordForm({ onSuccess, onCancel }: ChangePasswo
               New Password
             </label>
             <div className="relative">
-              <LockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <LockClosedIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type={showPasswords.new ? 'text' : 'password'}
                 name="newPassword"
@@ -170,7 +170,7 @@ export default function ChangePasswordForm({ onSuccess, onCancel }: ChangePasswo
               Confirm New Password
             </label>
             <div className="relative">
-              <LockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <LockClosedIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type={showPasswords.confirm ? 'text' : 'password'}
                 name="confirmPassword"

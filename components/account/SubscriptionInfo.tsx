@@ -7,17 +7,16 @@ import {
   BoltIcon, 
   CheckCircleIcon,
   ClockIcon,
-  CreditCardIcon
+  // CreditCardIcon
 } from '@heroicons/react/24/outline';
-import { User } from '@/types';
+import { User } from '../../types';
 
 interface SubscriptionInfoProps {
   user: User;
-  onUpgrade?: () => void;
   onCancel?: () => void;
 }
 
-export default function SubscriptionInfo({ user, onUpgrade, onCancel }: SubscriptionInfoProps) {
+export default function SubscriptionInfo({ user, onCancel }: SubscriptionInfoProps) {
   const [loading, setLoading] = useState(false);
 
   const getPlanDetails = () => {

@@ -22,7 +22,7 @@ export default function ToolsLayout({
   children: React.ReactNode
 }) {
   const pathname = usePathname();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<unknown>(null);
 
 useEffect(() => {
   try {

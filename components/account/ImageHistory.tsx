@@ -13,22 +13,22 @@ export default function ImageHistory() {
   const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
+    const loadImages = async () => {
+      try {
+        const response = await imageApi.getHistory(page);
+        if (response.success) {
+          setImages(prev => page === 1 ? response.data.images : [...prev, ...response.data.images]);
+          setHasMore(response.data.pagination.page < response.data.pagination.pages);
+        }
+      } catch (error) {
+        console.error('Failed to load images:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     loadImages();
   }, [page]);
-
-  const loadImages = async () => {
-    try {
-      const response = await imageApi.getHistory(page);
-      if (response.success) {
-        setImages(prev => page === 1 ? response.data.images : [...prev, ...response.data.images]);
-        setHasMore(response.data.pagination.page < response.data.pagination.pages);
-      }
-    } catch (error) {
-      console.error('Failed to load images:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDelete = async (imageId: string) => {
     if (!confirm('Are you sure you want to delete this image?')) return;

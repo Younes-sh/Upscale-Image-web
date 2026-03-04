@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
+// import Image from 'next/image';
 import { UserIcon, EnvelopeIcon, CalendarIcon, PencilIcon } from '@heroicons/react/24/outline';
-import { User } from '@/types';
+import { User } from '../../types';
 
 interface ProfileInfoProps {
   user: User;

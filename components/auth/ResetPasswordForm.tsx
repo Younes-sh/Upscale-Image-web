@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { LockIcon, EyeIcon, EyeSlashIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
+import { LockClosedIcon, EyeIcon, EyeSlashIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import { authApi } from '../../lib/api';
 
 export default function ResetPasswordForm() {
@@ -64,8 +64,9 @@ export default function ResetPasswordForm() {
           router.push('/login');
         }, 3000);
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to reset password. The token may be expired.');
+    } catch (err: unknown) {
+      const errMessage = err instanceof Error ? err.message : 'Failed to reset password. The token may be expired.';
+      setError(errMessage);
     } finally {
       setLoading(false);
     }
@@ -124,7 +125,7 @@ export default function ResetPasswordForm() {
             New Password
           </label>
           <div className="relative">
-            <LockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <LockClosedIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type={showPassword ? 'text' : 'password'}
               value={password}
@@ -165,7 +166,7 @@ export default function ResetPasswordForm() {
             Confirm New Password
           </label>
           <div className="relative">
-            <LockIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <LockClosedIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type={showConfirmPassword ? 'text' : 'password'}
               value={confirmPassword}
