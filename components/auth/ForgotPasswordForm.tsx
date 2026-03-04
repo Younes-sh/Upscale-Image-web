@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { EnvelopeIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-import { authApi } from '@/lib/api';
+import { authApi } from '../../lib/api';
 
 interface ForgotPasswordFormProps {
   onSuccess?: () => void;
