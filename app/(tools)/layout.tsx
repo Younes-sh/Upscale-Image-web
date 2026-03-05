@@ -10,6 +10,13 @@ import {
   UserCircleIcon
 } from '@heroicons/react/24/outline';
 
+// تعریف اینترفیس User (همان‌طور که خودتان نوشته‌اید)
+interface User {
+  name: string;
+  // اگر فیلدهای دیگری مانند email هم دارید، می‌توانید اضافه کنید
+  email?: string;
+}
+
 const tools = [
   { name: 'Image Upscaler', href: '/upscale', icon: PhotoIcon },
   { name: 'PDF Merger', href: '/pdf-merge', icon: DocumentIcon },
@@ -22,23 +29,23 @@ export default function ToolsLayout({
   children: React.ReactNode
 }) {
   const pathname = usePathname();
-  const [user, setUser] = useState<unknown>(null);
+  // ✅ استفاده از اینترفیس User برای state
+  const [user, setUser] = useState<User | null>(null);
 
-useEffect(() => {
-  try {
-    const userStr = localStorage.getItem('user');
-    if (userStr && userStr !== 'undefined') {
-      const userData = JSON.parse(userStr);
-      setUser(userData);
-    } else {
-      // اگر مقدار نامعتبر بود، پاکش کن
+  useEffect(() => {
+    try {
+      const userStr = localStorage.getItem('user');
+      if (userStr && userStr !== 'undefined') {
+        const userData = JSON.parse(userStr) as User; // ✅ استفاده از Type Assertion
+        setUser(userData);
+      } else {
+        localStorage.removeItem('user');
+      }
+    } catch (error) {
+      console.error('Error parsing user data:', error);
       localStorage.removeItem('user');
     }
-  } catch (error) {
-    console.error('Error parsing user data:', error);
-    localStorage.removeItem('user');
-  }
-}, []);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -83,6 +90,7 @@ useEffect(() => {
                     className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
                   >
                     <UserCircleIcon className="w-5 h-5" />
+                    {/* ✅ TypeScript حالا می‌داند user از نوع User است و name وجود دارد */}
                     <span className="text-sm hidden md:inline">{user.name}</span>
                   </Link>
                   <div className="h-4 w-px bg-gray-300 hidden md:block" />
