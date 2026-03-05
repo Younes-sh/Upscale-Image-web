@@ -29,7 +29,7 @@ const handler = NextAuth({
             email: profile.email,
             name: profile.name,
             provider: account.provider,
-            providerId: profile.sub || profile.id
+            providerId: profile.sub || account.providerAccountId
           });
 
           if (response.data.success) {
