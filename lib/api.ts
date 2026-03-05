@@ -118,24 +118,6 @@ export const authApi = {
     return response.data;
   },
 
-  // فراموشی رمز عبور (ارسال ایمیل بازیابی)
-  forgotPassword: async (email: string) => {
-    const response = await api.post('/auth/forgot-password', { email });
-    return response.data;
-  },
-
-  // بازنشانی رمز عبور با توکن
-  resetPassword: async (token: string, newPassword: string) => {
-    const response = await api.post('/auth/reset-password', { token, newPassword });
-    return response.data;
-  },
-
-  // تغییر رمز عبور (برای کاربران لاگین شده)
-  changePassword: async (data: { currentPassword: string; newPassword: string }) => {
-    const response = await api.put('/auth/change-password', data);
-    return response.data;
-  },
-
   // به‌روزرسانی پروفایل
   updateProfile: async (data: { name?: string; email?: string }) => {
     const response = await api.put('/auth/profile', data);
