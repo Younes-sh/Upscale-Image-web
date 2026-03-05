@@ -42,6 +42,12 @@ export const imageApi = {
     return response.data;
   },
 
+    // اضافه کردن به authApi
+  oauthLogin: async (data: { email: string; name: string; provider: string; providerId: string }) => {
+    const response = await api.post('/auth/oauth', data);
+    return response.data;
+  },
+
   // دریافت تاریخچه تصاویر
   getHistory: async (page = 1) => {
     const response = await api.get(`/images?page=${page}`);

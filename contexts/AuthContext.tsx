@@ -1,20 +1,9 @@
 'use client';
 
-import { createContext, useContext, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { authApi } from '../lib/api';
-
-declare module 'next-auth' {
-    interface Session {
-        user: {
-            id?: string;
-            name?: string | null;
-            email?: string | null;
-            image?: string | null;
-        };
-    }
-}
 
 // تعریف نوع داده کاربر
 interface User {
@@ -27,7 +16,6 @@ interface User {
     };
 }
 
-// تعریف نوع Context
 interface AuthContextType {
     user: User | null;
     loading: boolean;
@@ -39,37 +27,83 @@ interface AuthContextType {
     updateUser: (userData: Partial<User>) => void;
 }
 
-// ایجاد Context با مقدار پیش‌فرض
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Provider Component
 export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: session, status } = useSession();
+    const [user, setUser] = useState<User | null>(null);
     const loading = status === 'loading';
     const router = useRouter();
 
-    // همگام‌سازی کاربر NextAuth با localStorage
+    // بارگذاری کاربر از localStorage فقط در کلاینت
+    useEffect(() => {
+        const loadUserFromStorage = () => {
+            if (typeof window !== 'undefined') {
+                const userStr = localStorage.getItem('user');
+                if (userStr && userStr !== 'undefined') {
+                    try {
+                        setUser(JSON.parse(userStr));
+                    } catch (error) {
+                        console.error('Error parsing user:', error);
+                        localStorage.removeItem('user');
+                    }
+                }
+            }
+        };
+
+        loadUserFromStorage();
+    }, []);
+
+    // همگام‌سازی کاربر NextAuth با بک‌اند
     useEffect(() => {
         const syncUserWithBackend = async () => {
-            if (session?.user) {
+            // اگر session داریم ولی کاربر در state نیست
+            if (session?.user && !user) {
                 try {
-                    // اگر کاربر از طریق OAuth وارد شده، اطلاعاتش را با بک‌اند همگام کن
-                    const user: User = {
-                        id: session.user.id || session.user.email || '',
-                        name: session.user.name || '',
-                        email: session.user.email || '',
-                        freeUsesRemaining: 3,
-                        subscription: { type: 'free' }
-                    };
-                    localStorage.setItem('user', JSON.stringify(user));
+                    // فقط در کلاینت اجرا شود
+                    if (typeof window === 'undefined') return;
+
+                    // بررسی کنیم آیا قبلاً این کاربر را sync کرده‌ایم
+                    const syncedEmail = localStorage.getItem('synced_email');
+                    
+                    // اگر قبلاً sync شده و email یکی است، دوباره درخواست نده
+                    if (syncedEmail === session.user.email) {
+                        return;
+                    }
+
+                    // درخواست به بک‌اند برای OAuth login
+                    const response = await authApi.oauthLogin({
+                        email: session.user.email!,
+                        name: session.user.name!,
+                        provider: 'google', // یا github
+                        providerId: session.user.id
+                    });
+
+                    if (response.success) {
+                        localStorage.setItem('token', response.data.token);
+                        localStorage.setItem('user', JSON.stringify(response.data.user));
+                        localStorage.setItem('synced_email', session.user.email!);
+                        setUser(response.data.user);
+                    }
                 } catch (error) {
                     console.error('Error syncing OAuth user with backend:', error);
+                    // اگر بک‌اند وصل نیست، از اطلاعات session استفاده کن
+                    if (session.user) {
+                        const tempUser: User = {
+                            id: session.user.id || '',
+                            name: session.user.name || '',
+                            email: session.user.email || '',
+                            freeUsesRemaining: 3,
+                            subscription: { type: 'free' }
+                        };
+                        setUser(tempUser);
+                    }
                 }
             }
         };
 
         syncUserWithBackend();
-    }, [session]);
+    }, [session, user]);
 
     // تابع ورود با ایمیل و رمز
     const loginWithEmail = async (email: string, password: string) => {
@@ -77,8 +111,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const response = await authApi.login(email, password);
 
             if (response.success) {
-                localStorage.setItem('token', response.data.token);
-                localStorage.setItem('user', JSON.stringify(response.data.user));
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem('token', response.data.token);
+                    localStorage.setItem('user', JSON.stringify(response.data.user));
+                }
+                setUser(response.data.user);
                 router.push('/upscale');
             }
         } catch (error) {
@@ -103,8 +140,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const response = await authApi.register(name, email, password);
 
             if (response.success) {
-                localStorage.setItem('token', response.data.token);
-                localStorage.setItem('user', JSON.stringify(response.data.user));
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem('token', response.data.token);
+                    localStorage.setItem('user', JSON.stringify(response.data.user));
+                }
+                setUser(response.data.user);
                 router.push('/verify-email?email=' + encodeURIComponent(email));
             }
         } catch (error) {
@@ -115,52 +155,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // تابع خروج
     const logout = async () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            localStorage.removeItem('synced_email');
+        }
+        setUser(null);
         await signOut({ callbackUrl: '/' });
     };
 
     // به‌روزرسانی اطلاعات کاربر
     const updateUser = (userData: Partial<User>) => {
-        const userStr = localStorage.getItem('user');
-        if (userStr) {
-            try {
-                const currentUser = JSON.parse(userStr);
-                const updatedUser = { ...currentUser, ...userData };
+        if (user) {
+            const updatedUser = { ...user, ...userData };
+            if (typeof window !== 'undefined') {
                 localStorage.setItem('user', JSON.stringify(updatedUser));
-            } catch (error) {
-                console.error('Error updating user:', error);
             }
+            setUser(updatedUser);
         }
     };
-
-    // دریافت کاربر فعلی (از session یا localStorage)
-    const getCurrentUser = (): User | null => {
-        // اولویت با session کاربر OAuth است
-        if (session?.user) {
-            // تبدیل session.user به فرمت User
-            return {
-                id: session.user.id || session.user.email || '',
-                name: session.user.name || '',
-                email: session.user.email || '',
-                freeUsesRemaining: 3, // مقدار پیش‌فرض
-                subscription: { type: 'free' }
-            };
-        }
-
-        // اگر session نبود، از localStorage بخوان
-        const userStr = localStorage.getItem('user');
-        if (userStr && userStr !== 'undefined') {
-            try {
-                return JSON.parse(userStr);
-            } catch {
-                return null;
-            }
-        }
-        return null;
-    };
-
-    const user = getCurrentUser();
 
     return (
         <AuthContext.Provider value={{
@@ -178,13 +191,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
 }
 
-// Hook سفارشی برای استفاده از Context
 export function useAuth() {
     const context = useContext(AuthContext);
-
     if (context === undefined) {
         throw new Error('useAuth must be used within an AuthProvider');
     }
-
     return context;
 }
