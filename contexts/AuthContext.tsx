@@ -90,7 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     // اگر بک‌اند وصل نیست، از اطلاعات session استفاده کن
                     if (session.user) {
                         const tempUser: User = {
-                            id: session.user.id || '',
+                            id: session.user.email || 'unknown',
                             name: session.user.name || '',
                             email: session.user.email || '',
                             freeUsesRemaining: 3,
